@@ -11,6 +11,7 @@ from transformers import WhisperModel, AutoFeatureExtractor
 import random
 import io
 import torchaudio
+import soundfile as _sf
 #from .src.models.base.unet_spatio_temporal_condition import UNetSpatioTemporalConditionModel
 from .sonic import Sonic, sonic_predata, preprocess_face, crop_face_image
 from .src.dataset.test_preprocess import image_audio_to_tensor
@@ -174,12 +175,7 @@ class SONIC_PreData:
         infer_duration = min(duration,duration_input)
         print(f"Input audio duration is {duration_input} seconds, infer audio duration is: {duration} seconds.")
         # 修改为直接保存到临时文件，这是稳定可靠的必需步骤
-        torchaudio.save(
-            audio_path,
-            audio["waveform"].squeeze(0),
-            audio["sample_rate"],
-            format="WAV"
-        )
+        _sf.write(audio_path, audio["waveform"].squeeze(0).numpy().T, audio["sample_rate"], subtype="PCM_16")
         gc.collect()
         torch.cuda.empty_cache()
 
